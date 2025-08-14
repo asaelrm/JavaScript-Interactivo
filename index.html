@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Menú de Páginas | Portafolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg: #0f172a;         /* slate-900 */
+      --card: #111827;       /* gray-900 */
+      --muted: #94a3b8;      /* slate-400 */
+      --txt: #e5e7eb;        /* gray-200 */
+      --brand: #22d3ee;      /* cyan-400 */
+      --brand-2: #a78bfa;    /* violet-400 */
+      --ring: rgba(34,211,238,.35);
+      --ok: #22c55e;
+      --warn: #f59e0b;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--txt); background: radial-gradient(1200px 800px at 10% -10%, rgba(167,139,250,.15), transparent 50%), radial-gradient(1000px 600px at 110% 10%, rgba(34,211,238,.12), transparent 50%), var(--bg);
+      line-height:1.6;
+    }
+    header{
+      display:flex; align-items:center; justify-content:space-between; gap:.75rem;
+      padding:clamp(16px, 2vw, 24px);
+      position:sticky; top:0; backdrop-filter:saturate(160%) blur(8px);
+      background:linear-gradient( to bottom, rgba(15,23,42,.85), rgba(15,23,42,.55));
+      border-bottom:1px solid rgba(148,163,184,.12);
+      z-index:10;
+    }
+    .brand{font-weight:800; letter-spacing:.3px; font-size:clamp(18px, 1.8vw, 22px)}
+    .brand .em{color:var(--brand)}
+    .search{
+      display:flex; align-items:center; gap:.5rem; width:min(720px, 100%);
+      background:rgba(2,6,23,.6); border:1px solid rgba(148,163,184,.18); border-radius:14px; padding:.55rem .8rem;
+    }
+    .search input{flex:1; background:transparent; border:0; outline:none; color:var(--txt); font-size:15px}
+    .search input::placeholder{color:var(--muted)}
+    .toggle{
+      appearance:none; width:44px; height:28px; border-radius:999px; background:rgba(148,163,184,.25); position:relative; cursor:pointer; border:1px solid rgba(148,163,184,.25);
+    }
+    .toggle:checked{background:rgba(34,211,238,.35); border-color: var(--ring)}
+    .toggle:before{content:""; position:absolute; inset:3px auto 3px 3px; width:20px; border-radius:999px; background:#fff; transition:transform .25s}
+    .toggle:checked:before{transform:translateX(16px)}
+
+    main{padding:24px; max-width:1200px; margin:0 auto}
+    .grid{
+      display:grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); gap:18px;
+    }
+    .card{
+      display:flex; flex-direction:column; gap:8px; padding:16px; border-radius:16px;
+      background:linear-gradient(180deg, rgba(17,24,39,.96), rgba(17,24,39,.78));
+      border:1px solid rgba(148,163,184,.12); box-shadow:0 8px 24px rgba(0,0,0,.25);
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+      text-decoration:none; color:var(--txt);
+    }
+    .card:hover{ transform:translateY(-2px); border-color: rgba(34,211,238,.35); box-shadow:0 10px 32px rgba(34,211,238,.12)}
+    .card h3{margin:0; font-size:18px}
+    .card p{margin:0; color:var(--muted); font-size:14px}
+    .pill{display:inline-block; font-size:12px; padding:.2rem .5rem; border-radius:999px; border:1px solid rgba(148,163,184,.2); color:var(--brand-2)}
+    .footer{opacity:.8; text-align:center; padding:24px; color:var(--muted)}
+    .empty{opacity:.7; text-align:center; padding:32px; border:1px dashed rgba(148,163,184,.25); border-radius:16px}
+    .tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:2px}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">Menú de <span class="em">Páginas</span></div>
+    <label class="search" aria-label="Buscar página">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M21 21l-4.2-4.2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/></svg>
+      <input id="q" type="search" placeholder="Buscar (ej. restaurante, cine, carrito)" />
+    </label>
+    <input id="theme" class="toggle" type="checkbox" title="Modo claro" aria-label="Cambiar tema" />
+  </header>
+
+  <main>
+    <div id="list" class="grid" aria-live="polite"></div>
+    <div id="empty" class="empty" style="display:none">Sin resultados. Ajusta tu búsqueda.</div>
+  </main>
+
+  <footer class="footer">© <span id="yy"></span> Tu Portafolio. Actualiza las rutas de cada enlace según tu estructura.</footer>
+
+  <script>
+    // ====== Configura aquí tus páginas ======
+    const PAGES = [
+      { title: "Lista Interactiva", href: "file:///C:/Users/lrosario.cmucesd/Downloads/JavaScript/Clase%20dia%2025/Listainteractiva.html", desc: "Parallax, carrusel, zoom, gradientes animados.", tags:["HTML","CSS","JS"] },
+      { title: "Trivia JS", href: "file:///C:/Users/lrosario.cmucesd/Downloads/JavaScript/Clase%20dia%2025/trivia.html", desc: "Temporizador, feedback, historial.", tags:["Juego","JS"] },
+      { title: "Carrito de Compras", href: "file:///C:/Users/lrosario.cmucesd/Downloads/JavaScript/Clase%20dia%2025/carritofalso.html", desc: "LocalStorage, remover, checkout simulado.", tags:["E‑commerce"] },
+    ];
+
+    // ====== Render ======
+    const list = document.getElementById('list');
+    const empty = document.getElementById('empty');
+    const q = document.getElementById('q');
+    const yy = document.getElementById('yy');
+    yy.textContent = new Date().getFullYear();
+
+    function card({title, href, desc, tags}){
+      const a = document.createElement('a');
+      a.className = 'card';
+      a.href = href;
+      a.innerHTML = `<span class="pill">${new URL(href, location.href).hostname.includes(location.hostname) ? 'Local' : 'Externo'}</span>
+                     <h3>${title}</h3>
+                     <p>${desc}</p>
+                     <div class="tags">${(tags||[]).map(t=>`<span class="pill" style="color:var(--brand)">${t}</span>`).join('')}</div>`;
+      return a;
+    }
+
+    function render(items){
+      list.innerHTML = '';
+      items.forEach(p => list.appendChild(card(p)));
+      empty.style.display = items.length ? 'none' : 'block';
+    }
+
+    // Búsqueda en vivo
+    q.addEventListener('input', ()=>{
+      const term = q.value.trim().toLowerCase();
+      const filtered = PAGES.filter(p => (p.title+p.desc+(p.tags||[]).join(' ')).toLowerCase().includes(term));
+      render(filtered);
+    });
+
+    // Modo claro/oscuro (persistente)
+    const themeToggle = document.getElementById('theme');
+    const THEME_KEY = 'menu-theme';
+    const saved = localStorage.getItem(THEME_KEY) || 'dark';
+    if(saved === 'light'){ document.body.style.filter='invert(1) hue-rotate(180deg)'; themeToggle.checked = true; }
+    themeToggle.addEventListener('change', ()=>{
+      const light = themeToggle.checked;
+      document.body.style.filter = light ? 'invert(1) hue-rotate(180deg)' : 'none';
+      localStorage.setItem(THEME_KEY, light? 'light':'dark');
+    });
+
+    render(PAGES);
+  </script>
+</body>
+</html>

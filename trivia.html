@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trivia de JavaScript</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f9f9f9;
+    }
+    #quiz-container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2, p {
+      text-align: center;
+    }
+    .question {
+      font-weight: bold;
+    }
+    .answers button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      background-color: #e0e0e0;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: 0.3s;
+    }
+    .answers button:hover {
+      background-color: #ccc;
+    }
+    .result {
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+    .feedback {
+      text-align: center;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+    .correct { color: green; }
+    .incorrect { color: red; }
+    #timer {
+      text-align: center;
+      font-size: 18px;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+    #history {
+      margin-top: 20px;
+      padding: 10px;
+      background: #f0f0f0;
+      border-radius: 8px;
+    }
+    #history h3 {
+      margin-top: 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="quiz-container">
+    <h2>🧠 Trivia de JavaScript</h2>
+    <div id="timer">Tiempo: 10s</div>
+    <div id="question-container">
+      <p class="question" id="question"></p>
+      <div class="answers" id="answers"></div>
+    </div>
+    <p class="feedback" id="feedback"></p>
+    <p class="result" id="result"></p>
+    <div id="history">
+      <h3>Historial de intentos</h3>
+      <ul id="historyList"></ul>
+    </div>
+  </div>
+
+  <script>
+    const questions = [
+      { question: "¿Qué método convierte JSON a objeto?", answers: ["stringify()", "parse()", "toObject()", "JSON.stringify"], correct: 1 },
+      { question: "¿Cuál es el símbolo del operador de igualdad estricta?", answers: ["==", "=", "===", "!=="], correct: 2 },
+      { question: "¿Qué tipo de variable permite reasignación con let?", answers: ["const", "var", "let", "int"], correct: 2 },
+      { question: "¿Qué función imprime en la consola?", answers: ["alert()", "print()", "console.log()", "log.console()"], correct: 2 },
+      { question: "¿Cuál es el valor de typeof null?", answers: ["object", "null", "undefined", "string"], correct: 0 },
+      { question: "¿Qué palabra clave se usa para declarar una constante?", answers: ["var", "let", "const", "constant"], correct: 2 }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let timer;
+    let timeLeft = 10;
+
+    const questionEl = document.getElementById("question");
+    const answersEl = document.getElementById("answers");
+    const resultEl = document.getElementById("result");
+    const feedbackEl = document.getElementById("feedback");
+    const timerEl = document.getElementById("timer");
+    const historyList = document.getElementById("historyList");
+
+    function loadQuestion() {
+      clearInterval(timer);
+      timeLeft = 10;
+      updateTimer();
+      timer = setInterval(countdown, 1000);
+
+      feedbackEl.textContent = "";
+      const q = questions[currentQuestion];
+      questionEl.textContent = q.question;
+      answersEl.innerHTML = "";
+      q.answers.forEach((answer, index) => {
+        const btn = document.createElement("button");
+        btn.textContent = answer;
+        btn.onclick = () => selectAnswer(index);
+        answersEl.appendChild(btn);
+      });
+    }
+
+    function countdown() {
+      timeLeft--;
+      updateTimer();
+      if (timeLeft <= 0) {
+        clearInterval(timer);
+        nextQuestion();
+      }
+    }
+
+    function updateTimer() {
+      timerEl.textContent = `Tiempo: ${timeLeft}s`;
+    }
+
+    function selectAnswer(index) {
+      clearInterval(timer);
+      if (index === questions[currentQuestion].correct) {
+        score++;
+        feedbackEl.textContent = "✅ ¡Correcto!";
+        feedbackEl.className = "feedback correct";
+      } else {
+        feedbackEl.textContent = "❌ Incorrecto";
+        feedbackEl.className = "feedback incorrect";
+      }
+      setTimeout(nextQuestion, 1000);
+    }
+
+    function nextQuestion() {
+      currentQuestion++;
+      if (currentQuestion < questions.length) {
+        loadQuestion();
+      } else {
+        showResult();
+      }
+    }
+
+    function showResult() {
+      questionEl.textContent = "Trivia Finalizada";
+      answersEl.innerHTML = "";
+      feedbackEl.textContent = "";
+      resultEl.textContent = `Puntaje final: ${score} de ${questions.length}`;
+      saveScore(score);
+      loadHistory();
+    }
+
+    function saveScore(score) {
+      const history = JSON.parse(localStorage.getItem("quizHistory")) || [];
+      history.push({ date: new Date().toLocaleString(), score: score });
+      localStorage.setItem("quizHistory", JSON.stringify(history));
+    }
+
+    function loadHistory() {
+      const history = JSON.parse(localStorage.getItem("quizHistory")) || [];
+      historyList.innerHTML = "";
+      history.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = `${item.date} - Puntaje: ${item.score}`;
+        historyList.appendChild(li);
+      });
+    }
+
+    // Iniciar la trivia
+    loadQuestion();
+    loadHistory();
+  </script>
+</body>
+</html>
